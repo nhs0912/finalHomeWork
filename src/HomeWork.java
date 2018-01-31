@@ -55,7 +55,7 @@ public class HomeWork {
 
     void makeHuman() throws IOException {
         //사람 생성
-        int humanCnt = 20430900;
+        int humanCnt = 17500000;
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(
                 new FileOutputStream("test.gz"))));
 

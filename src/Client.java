@@ -3,6 +3,23 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+class readData extends Thread {
+
+    @Override
+    public void run() {
+
+    }
+}
+
+class sendData extends Thread {
+    @Override
+    public void run() {
+
+    }
+
+}
 
 
 public class Client {
@@ -16,28 +33,28 @@ public class Client {
             System.out.println("client 연결 성공");
             OutputStream out = socket.getOutputStream();
 
-            String fileName = "./src/test.txt";
+            String fileName = "./src/test.txt.gz";
             System.out.println(fileName + "전송!");
             //File file = new File("./" + "test.txt");
 
             FileInputStream fis = new FileInputStream(fileName);
             BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(fis));
 
-            //FileOutputStream fos = new FileOutputStream(d);
             DataOutputStream dos = new DataOutputStream(out);
-            BufferedOutputStream bos = new BufferedOutputStream(dos);
+            BufferedOutputStream bos = new BufferedOutputStream(new GZIPOutputStream(dos));
 
             //DataInputStream dis = new DataOutputStream("test.gz");
-            byte[] buffer = new byte[10];
+            byte[] buffer = new byte[622];
 
             while (true) {
                 int data = bis.read(buffer);
                 if (data == -1) {
                     break;
                 }
-
                 bos.write(buffer, 0, data);
             }
+
+
             for (byte b : buffer) {
                 System.out.print(b + " ");
             }
@@ -45,13 +62,10 @@ public class Client {
 
             bos.flush();
             bos.close();
-
-
             fis.close();
             out.close();
-
-
             socket.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

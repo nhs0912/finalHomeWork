@@ -1,5 +1,7 @@
 import java.io.*;
 import java.net.*;
+import java.util.Date;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 class Server extends Thread {
@@ -8,7 +10,7 @@ class Server extends Thread {
 
         ServerSocket s = null;
         try {
-            s = new ServerSocket(0);         // Register your service on port 5432
+            s = new ServerSocket(5432);         // Register your service on port 5432
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -20,25 +22,23 @@ class Server extends Thread {
                 int localPortNumber = s.getLocalPort();
                 File logFile = new File(logFileName);
                 BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(logFile, true));
+                Date date = new Date();
+                bufferedWriter.newLine();
 
-                bufferedWriter.write(Integer.toString(localPortNumber));
-                bufferedWriter.flush();
-                bufferedWriter.close();
+                bufferedWriter.write(Integer.toString(localPortNumber) + " " + date.toString());
+
                 System.out.println("Server Port Number : " + localPortNumber);
                 System.out.println("server 연결 기다림");
                 Socket socket = s.accept();     // Wait here and listen for a connection
                 System.out.println("연결 된 client 주소 : " + socket.getInetAddress());
                 InputStream in = socket.getInputStream();
                 DataInputStream dis = new DataInputStream(in);
-                BufferedInputStream bis = new BufferedInputStream(dis);
+                BufferedInputStream bis = new BufferedInputStream(new GZIPInputStream(dis));
 
-                //OutputStream out = socket.getOutputStream();
-                //DataOutput dos = new DataOutputStream(out);
-
-                FileOutputStream fos = new FileOutputStream("test.txt");
+                FileOutputStream fos = new FileOutputStream("receivedFile.gz");
                 BufferedOutputStream bos = new BufferedOutputStream(new GZIPOutputStream(fos));
 
-                byte[] buffer = new byte[10];
+                byte[] buffer = new byte[622];
                 while (true) {
                     int data = bis.read(buffer);
                     if (data == -1)
@@ -46,8 +46,6 @@ class Server extends Thread {
                     bos.write(buffer);
                 }
 
-                bos.flush();
-                bis.close();
 
                 for (byte b : buffer) {
                     System.out.print(b + " ");
@@ -58,7 +56,10 @@ class Server extends Thread {
                 in.close();
                 socket.close();
                 fos.close();
-
+                bufferedWriter.flush();
+                bufferedWriter.close();
+                bos.flush();
+                bis.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
