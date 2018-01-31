@@ -10,7 +10,7 @@ class Server extends Thread {
 
         ServerSocket s = null;
         try {
-            s = new ServerSocket(5432);         // Register your service on port 5432
+            s = new ServerSocket(0);         // Register your service on port 5432
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -44,12 +44,17 @@ class Server extends Thread {
                     if (data == -1)
                         break;
                     bos.write(buffer);
-                }
 
+                }
+                int cnt =0;
 
                 for (byte b : buffer) {
                     System.out.print(b + " ");
+                    if (cnt++ % 100 == 0) {
+                        System.out.println();
+                    }
                 }
+
                 System.out.println("\ndata 받기 성공");
                 dis.close();
 
@@ -58,7 +63,7 @@ class Server extends Thread {
                 fos.close();
                 bufferedWriter.flush();
                 bufferedWriter.close();
-                bos.flush();
+//                bos.close();
                 bis.close();
             } catch (IOException e) {
                 e.printStackTrace();

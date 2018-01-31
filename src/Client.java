@@ -2,6 +2,8 @@
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -24,6 +26,9 @@ class sendData extends Thread {
 
 public class Client {
 
+    Queue<Thread> queue = new LinkedList<>();
+
+
     public static void main(String[] args) {
         Socket socket = null;
         try {
@@ -33,7 +38,7 @@ public class Client {
             System.out.println("client 연결 성공");
             OutputStream out = socket.getOutputStream();
 
-            String fileName = "./src/test.txt.gz";
+            String fileName = "./src/test.gz";
             System.out.println(fileName + "전송!");
             //File file = new File("./" + "test.txt");
 
@@ -52,15 +57,21 @@ public class Client {
                     break;
                 }
                 bos.write(buffer, 0, data);
+                bos.flush();
             }
 
 
+            int cnt = 0;
             for (byte b : buffer) {
+                cnt++;
                 System.out.print(b + " ");
+                if (cnt % 100 == 0) {
+                    System.out.println();
+                }
             }
             System.out.println("\n데이터 보내기 성공");
 
-            bos.flush();
+
             bos.close();
             fis.close();
             out.close();
